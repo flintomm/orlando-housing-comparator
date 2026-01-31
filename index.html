@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orlando Housing Comparator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --dark: #2d3748;
+            --gray: #718096;
+            --light: #f7fafc;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--light) 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Budget Filter */
+        .budget-filter {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .budget-filter label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .budget-filter input[type="range"] {
+            flex: 1;
+            min-width: 200px;
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .budget-filter input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .budget-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            min-width: 150px;
+            text-align: center;
+        }
+
+        /* Comparison Grid */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .neighborhood-card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .neighborhood-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .neighborhood-card.disabled {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            color: var(--white);
+            position: relative;
+        }
+
+        .card-header.lake-nona { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-header.clermont { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+        .card-header.dr-phillips { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+        .card-header.hunters-creek { background: linear-gradient(135deg, #718096 0%, #4a5568 100%); }
+
+        .card-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .median-price {
+            font-size: 1.25rem;
+            font-weight: 600;
+            opacity: 0.95;
+        }
+
+        .affordability-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .affordability-badge.within { background: var(--success); }
+        .affordability-badge.stretch { background: var(--warning); }
+        .affordability-badge.over { background: var(--danger); }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .metric-value.good { color: var(--success); }
+        .metric-value.warning { color: var(--warning); }
+        .metric-value.danger { color: var(--danger); }
+
+        /* Score Bar */
+        .score-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .score-fill.excellent { background: var(--success); }
+        .score-fill.good { background: #4299e1; }
+        .score-fill.fair { background: var(--warning); }
+        .score-fill.poor { background: var(--danger); }
+
+        /* Comparison Table */
+        .table-section {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .table-section h2 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        /* Key Insights */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .insight-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .insight-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: var(--dark);
+        }
+
+        .insight-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Toggle switches */
+        .toggle-section {
+            background: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            background: var(--white);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .budget-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            th, td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏠 Orlando Housing Comparator</h1>
+        <p>Compare neighborhoods across schools, diversity, commute, and value</p>
+    </header>
+
+    <div class="container">
+        <!-- Budget Filter -->
+        <div class="budget-filter">
+            <label>Your Budget:</label>
+            <input type="range" id="budget-slider" min="300000" max="700000" step="10000" value="450000">
+            <div class="budget-display" id="budget-display">$450K</div>
+        </div>
+
+        <!-- View Toggles -->
+        <div class="toggle-section">
+            <span style="font-weight: 600; color: var(--gray);">Show:</span>
+            <button class="toggle-btn active" onclick="toggleView('all')">All Areas</button>
+            <button class="toggle-btn" onclick="toggleView('affordable')">Within Budget</button>
+            <button class="toggle-btn" onclick="toggleView('family')">Family-Friendly</button>
+        </div>
+
+        <!-- Comparison Cards -->
+        <div class="comparison-grid" id="comparison-grid">
+            <!-- Cards will be generated by JavaScript -->
+        </div>
+
+        <!-- Detailed Comparison Table -->
+        <div class="table-section">
+            <h2>📊 Detailed Comparison</h2>
+            <table id="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Lake Nona</th>
+                        <th>Clermont</th>
+                        <th>Dr. Phillips</th>
+                        <th>Hunter's Creek</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Rows generated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="insights-grid">
+            <div class="insight-card">
+                <h3>💰 The Budget Reality</h3>
+                <p>Lake Nona's $500K+ median puts it out of reach for many. Clermont offers the best value entry point at $367K for townhomes, while Dr. Phillips requires stretching to $570K.</p>
+            </div>
+            <div class="insight-card">
+                <h3>🎓 School Quality Pattern</h3>
+                <p>Newer areas (Lake Nona, Clermont) have stronger, more consistent school ratings. Established areas like Dr. Phillips show uneven quality—strong elementary, weak high school.</p>
+            </div>
+            <div class="insight-card">
+                <h3>⚠️ The Hidden Metric</h3>
+                <p>Free/reduced lunch percentage reveals economic stress. Dr. Phillips at 49% suggests resource strain and peer dynamic challenges despite surface diversity.</p>
+            </div>
+            <div class="insight-card">
+                <h3>📈 Appreciation vs. Affordability</h3>
+                <p>Clermont's Wellness Way development brings 6,000+ new homes—great for choice now, but expect flat appreciation for 3-5 years as supply absorbs.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const neighborhoods = [
+            {
+                id: 'lake-nona',
+                name: 'Lake Nona',
+                medianPrice: 500000,
+                schoolScore: 85,
+                diversityScore: 75,
+                commuteScore: 70,
+                appreciationScore: 80,
+                affordability: 'over',
+                schoolRating: 'A-rated (7/10)',
+                diversity: '46% White, 34% Hispanic',
+                freeLunch: 'Low',
+                commute: '20-30 min',
+                notes: 'Medical City jobs, master-planned'
+            },
+            {
+                id: 'clermont',
+                name: 'Clermont',
+                medianPrice: 447000,
+                entryPrice: 367990,
+                schoolScore: 80,
+                diversityScore: 50,
+                commuteScore: 45,
+                appreciationScore: 40,
+                affordability: 'within',
+                schoolRating: 'Pinecrest 10/10, WOHS A',
+                diversity: 'Less diverse',
+                freeLunch: 'Moderate',
+                commute: '35-45 min',
+                notes: 'Wellness Way: 6K+ new homes coming'
+            },
+            {
+                id: 'dr-phillips',
+                name: 'Dr. Phillips',
+                medianPrice: 570000,
+                schoolScore: 55,
+                diversityScore: 85,
+                commuteScore: 85,
+                appreciationScore: 70,
+                affordability: 'over',
+                schoolRating: 'Uneven (ES good, HS poor)',
+                diversity: '43% Hispanic, 33% Black',
+                freeLunch: '49% ⚠️',
+                commute: '15-25 min',
+                notes: 'High economic stress signal'
+            },
+            {
+                id: 'hunters-creek',
+                name: "Hunter's Creek",
+                medianPrice: 420000,
+                schoolScore: 65,
+                diversityScore: 70,
+                commuteScore: 75,
+                appreciationScore: 55,
+                affordability: 'stretch',
+                schoolRating: 'Needs verification',
+                diversity: 'Moderate',
+                freeLunch: 'Unknown',
+                commute: '20-30 min',
+                notes: '1980s-90s stock, aging'
+            }
+        ];
+
+        let userBudget = 450000;
+
+        function formatCurrency(value) {
+            if (value >= 1000000) return '$' + (value / 1000000).toFixed(1) + 'M';
+            return '$' + (value / 1000).toFixed(0) + 'K';
+        }
+
+        function getAffordabilityStatus(n) {
+            const entryPrice = n.entryPrice || n.medianPrice;
+            if (entryPrice <= userBudget) return { label: 'Within Budget', class: 'within' };
+            if (entryPrice <= userBudget * 1.15) return { label: 'Stretch', class: 'stretch' };
+            return { label: 'Over Budget', class: 'over' };
+        }
+
+        function renderCards() {
+            const grid = document.getElementById('comparison-grid');
+            grid.innerHTML = neighborhoods.map(n => {
+                const affordability = getAffordabilityStatus(n);
+                const entryPrice = n.entryPrice || n.medianPrice;
+                const isDisabled = affordability.class === 'over';
+                
+                return `
+                    <div class="neighborhood-card ${isDisabled ? 'disabled' : ''}" data-id="${n.id}">
+                        <div class="card-header ${n.id}">
+                            <span class="affordability-badge ${affordability.class}">${affordability.label}</span>
+                            <h2>${n.name}</h2>
+                            <div class="median-price">
+                                ${n.entryPrice ? `${formatCurrency(n.entryPrice)}+` : formatCurrency(n.medianPrice)} median
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="metric">
+                                <span class="metric-label">Schools</span>
+                                <div>
+                                    <div class="metric-value ${n.schoolScore >= 70 ? 'good' : n.schoolScore >= 50 ? 'warning' : 'danger'}">${n.schoolRating}</div>
+                                    <div class="score-bar">
+                                        <div class="score-fill ${n.schoolScore >= 80 ? 'excellent' : n.schoolScore >= 60 ? 'good' : 'fair'}" style="width: ${n.schoolScore}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Diversity</span>
+                                <span class="metric-value">${n.diversity}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Free/Reduced Lunch</span>
+                                <span class="metric-value ${n.freeLunch.includes('⚠️') ? 'danger' : n.freeLunch === 'Low' ? 'good' : 'warning'}">${n.freeLunch}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Commute</span>
+                                <span class="metric-value">${n.commute}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Notes</span>
+                                <span class="metric-value" style="font-size: 0.85rem; color: var(--gray);">${n.notes}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const metrics = [
+                { label: 'Median Price', key: 'medianPrice', format: v => formatCurrency(v) },
+                { label: 'Entry Price', key: 'entryPrice', format: v => v ? formatCurrency(v) + '+' : formatCurrency(neighborhoods.find(n => n.id === 'clermont').entryPrice) + '+' },
+                { label: 'School Rating', key: 'schoolRating' },
+                { label: 'Demographics', key: 'diversity' },
+                { label: 'Economic Stress', key: 'freeLunch' },
+                { label: 'Commute (Downtown)', key: 'commute' },
+                { label: 'Appreciation Outlook', key: 'notes', format: v => v.includes('flat') || v.includes('6K+') ? 'Flat (3-5 yrs)' : v.includes('built out') ? 'Steady' : 'Strong' }
+            ];
+
+            tbody.innerHTML = metrics.map(m => `
+                <tr>
+                    <td><strong>${m.label}</strong></td>
+                    ${neighborhoods.map(n => {
+                        let value = n[m.key];
+                        if (m.format) value = m.format(value);
+                        if (m.key === 'entryPrice' && !n.entryPrice) value = '—';
+                        
+                        let cellClass = '';
+                        if (m.key === 'freeLunch' && value.includes('⚠️')) cellClass = 'style="color: var(--danger); font-weight: 600;"';
+                        if (m.key === 'schoolRating' && value.includes('10/10')) cellClass = 'style="color: var(--success); font-weight: 600;"';
+                        
+                        return `<td ${cellClass}>${value}</td>`;
+                    }).join('')}
+                </tr>
+            `).join('');
+        }
+
+        function toggleView(view) {
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const cards = document.querySelectorAll('.neighborhood-card');
+            cards.forEach(card => {
+                const id = card.dataset.id;
+                const n = neighborhoods.find(x => x.id === id);
+                
+                if (view === 'all') {
+                    card.style.display = 'block';
+                } else if (view === 'affordable') {
+                    const affordability = getAffordabilityStatus(n);
+                    card.style.display = affordability.class === 'within' ? 'block' : 'none';
+                } else if (view === 'family') {
+                    card.style.display = n.schoolScore >= 70 ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Budget slider
+        const slider = document.getElementById('budget-slider');
+        const display = document.getElementById('budget-display');
+
+        slider.addEventListener('input', (e) => {
+            userBudget = parseInt(e.target.value);
+            display.textContent = formatCurrency(userBudget);
+            renderCards();
+        });
+
+        // Initial render
+        renderCards();
+        renderTable();
+    </script>
+</body>
+</html>
