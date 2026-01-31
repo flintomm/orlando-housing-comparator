@@ -140,6 +140,7 @@
         .card-header.clermont { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
         .card-header.dr-phillips { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
         .card-header.hunters-creek { background: linear-gradient(135deg, #718096 0%, #4a5568 100%); }
+        .card-header.lowell-ma { background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%); }
 
         .card-header h2 {
             font-size: 1.5rem;
@@ -372,6 +373,7 @@
                         <th>Clermont</th>
                         <th>Dr. Phillips</th>
                         <th>Hunter's Creek</th>
+                        <th>Lowell, MA</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -405,6 +407,10 @@
             <div class="insight-card">
                 <h3>💵 Income & Affordability Gap</h3>
                 <p>Lake Nona ($118K) and Dr. Phillips ($110K) median incomes far exceed what's needed for their home prices. Clermont's affordability comes with lower incomes (~$75K) but still manageable ratios.</p>
+            </div>
+            <div class="insight-card">
+                <h3>🏙️ Orlando vs. Lowell, MA</h3>
+                <p>Lowell offers similar pricing to Orlando ($488K median) but with tradeoffs: high diversity (44% White, 21% Asian, 19% Hispanic), weaker schools (3/10 rating), and declining prices (-4.4%). Massachusetts property taxes are comparable but income levels similar to Clermont.</p>
             </div>
         </div>
 
@@ -455,6 +461,11 @@
                         <td><strong>Development Data</strong></td>
                 <td>Lake County Planning, Jared Jones Real Estate, Orlando Business Journal</td>
                         <td>Wellness Way: 15,000 acres, $1B+ investment, 6,000+ homes from GT USA, Pulte, Richland, Lenar.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lowell, MA Data</strong></td>
+                        <td>Census Bureau, Redfin, GreatSchools, NeighborhoodScout</td>
+                        <td>Lowell: 114K population, 35.5 median age, 29.6% foreign-born. Home prices down 4.4% YoY (Dec 2025). Crime: higher than 96% of MA cities per NeighborhoodScout.</td>
                     </tr>
                 </tbody>
             </table>
@@ -543,6 +554,26 @@
                 propertyTax: '$5,002/yr ($300K home)',
                 walkScore: 'Somewhat walkable',
                 forecast: 'Stable'
+            },
+            {
+                id: 'lowell-ma',
+                name: 'Lowell, MA',
+                medianPrice: 488000,
+                schoolScore: 40,
+                diversityScore: 90,
+                commuteScore: 60,
+                appreciationScore: 50,
+                affordability: 'over',
+                schoolRating: 'Lowell High: 3/10 (below avg)',
+                diversity: '44% White, 21% Asian, 19% Hispanic',
+                freeLunch: 'High (est. 60%+)',
+                commute: '27.5 min avg (Boston area)',
+                notes: 'Very diverse, older industrial city',
+                crimeSafety: '67th percentile (mixed data)',
+                medianIncome: '$76,205',
+                propertyTax: '~$4,500/yr ($300K home)',
+                walkScore: 'Somewhat walkable',
+                forecast: '-4.4% (Dec 2025 YoY)'
             }
         ];
 
