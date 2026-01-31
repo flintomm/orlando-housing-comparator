@@ -398,6 +398,66 @@
                 <h3>📈 Appreciation vs. Affordability</h3>
                 <p>Clermont's Wellness Way development brings 6,000+ new homes—great for choice now, but expect flat appreciation for 3-5 years as supply absorbs.</p>
             </div>
+            <div class="insight-card">
+                <h3>🛡️ Safety Disparities</h3>
+                <p>Crime rates vary dramatically. Lake Nona (99th percentile safety) and Dr. Phillips (30-50% below city average) are considerably safer than Orlando overall, which ranks in the bottom 10% nationally.</p>
+            </div>
+            <div class="insight-card">
+                <h3>💵 Income & Affordability Gap</h3>
+                <p>Lake Nona ($118K) and Dr. Phillips ($110K) median incomes far exceed what's needed for their home prices. Clermont's affordability comes with lower incomes (~$75K) but still manageable ratios.</p>
+            </div>
+        </div>
+
+        <!-- Data Sources -->
+        <div class="table-section" style="margin-top: 2rem;">
+            <h2>📚 Data Sources</h2>
+            <p style="color: var(--gray); margin-bottom: 1rem;">All statistics compiled from reliable public sources. Last updated January 2026.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Source</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Crime Statistics</strong></td>
+                        <td>FBI Crime Data (2024), CrimeGrade.org, AreaVibes</td>
+                        <td>Orlando overall: 109% above national crime average. Lake Nona: 99th percentile safety. Dr. Phillips: 30-50% below city average.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Home Prices</strong></td>
+                        <td>Zillow, Redfin, Orlando Regional REALTOR® Association (Nov 2025)</td>
+                        <td>Median prices reflect most recent available data. Entry prices from builder websites (Lennar, Pulte).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>School Ratings</strong></td>
+                        <td>GreatSchools.org, Niche.com, Florida Dept of Education</td>
+                        <td>GreatSchools uses 1-10 scale. Niche uses A-F grades. Free/reduced lunch data from NCES.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Household Income</strong></td>
+                        <td>Census Bureau, Point2Homes, BestNeighborhood.org</td>
+                        <td>Lake Nona: $118,830 (88th percentile nationally). Dr. Phillips: $109,918. Clermont: estimated $75,000.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Property Taxes</strong></td>
+                        <td>Florida Tax Watch, Orange County Property Appraiser</td>
+                        <td>Orange County: ~$5,002/year on $300K home (16.67 mills). Lake County slightly lower.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Market Forecasts</strong></td>
+                        <td>Zillow, Redfin, Morgan Stanley, local brokerages</td>
+                        <td>Lake Nona: +1.2% (Zillow). Clermont: 2-5% annual appreciation expected. Dr. Phillips: +10.7% (2025).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Development Data</strong></td>
+                <td>Lake County Planning, Jared Jones Real Estate, Orlando Business Journal</td>
+                        <td>Wellness Way: 15,000 acres, $1B+ investment, 6,000+ homes from GT USA, Pulte, Richland, Lenar.</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -416,7 +476,12 @@
                 diversity: '46% White, 34% Hispanic',
                 freeLunch: 'Low',
                 commute: '20-30 min',
-                notes: 'Medical City jobs, master-planned'
+                notes: 'Medical City jobs, master-planned',
+                crimeSafety: '99th percentile',
+                medianIncome: '$118,830',
+                propertyTax: '$5,002/yr ($300K home)',
+                walkScore: 'Car-dependent',
+                forecast: '+1.2% (Zillow 2026)'
             },
             {
                 id: 'clermont',
@@ -432,7 +497,12 @@
                 diversity: 'Less diverse',
                 freeLunch: 'Moderate',
                 commute: '35-45 min',
-                notes: 'Wellness Way: 6K+ new homes coming'
+                notes: 'Wellness Way: 6K+ new homes coming',
+                crimeSafety: 'Lower than Orlando avg',
+                medianIncome: '$75,000 (est.)',
+                propertyTax: '~$4,200/yr ($300K home)',
+                walkScore: 'Car-dependent',
+                forecast: '2-5% (slow/steady)'
             },
             {
                 id: 'dr-phillips',
@@ -447,7 +517,12 @@
                 diversity: '43% Hispanic, 33% Black',
                 freeLunch: '49% ⚠️',
                 commute: '15-25 min',
-                notes: 'High economic stress signal'
+                notes: 'High economic stress signal',
+                crimeSafety: '30-50% below city avg',
+                medianIncome: '$109,918',
+                propertyTax: '$5,002/yr ($300K home)',
+                walkScore: 'Somewhat walkable',
+                forecast: '+10.7% (2025 YoY)'
             },
             {
                 id: 'hunters-creek',
@@ -462,7 +537,12 @@
                 diversity: 'Moderate',
                 freeLunch: 'Unknown',
                 commute: '20-30 min',
-                notes: '1980s-90s stock, aging'
+                notes: '1980s-90s stock, aging',
+                crimeSafety: 'Near city avg',
+                medianIncome: '$85,000 (est.)',
+                propertyTax: '$5,002/yr ($300K home)',
+                walkScore: 'Somewhat walkable',
+                forecast: 'Stable'
             }
         ];
 
@@ -507,8 +587,16 @@
                                 </div>
                             </div>
                             <div class="metric">
-                                <span class="metric-label">Diversity</span>
-                                <span class="metric-value">${n.diversity}</span>
+                                <span class="metric-label">Crime Safety</span>
+                                <span class="metric-value ${n.crimeSafety.includes('99th') ? 'good' : n.crimeSafety.includes('30-50') ? 'good' : 'warning'}">${n.crimeSafety}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Median Income</span>
+                                <span class="metric-value">${n.medianIncome}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Property Tax (est.)</span>
+                                <span class="metric-value">${n.propertyTax}</span>
                             </div>
                             <div class="metric">
                                 <span class="metric-label">Free/Reduced Lunch</span>
@@ -519,8 +607,8 @@
                                 <span class="metric-value">${n.commute}</span>
                             </div>
                             <div class="metric">
-                                <span class="metric-label">Notes</span>
-                                <span class="metric-value" style="font-size: 0.85rem; color: var(--gray);">${n.notes}</span>
+                                <span class="metric-label">2026 Forecast</span>
+                                <span class="metric-value ${n.forecast.includes('+') && !n.forecast.includes('Flat') ? 'good' : 'warning'}">${n.forecast}</span>
                             </div>
                         </div>
                     </div>
@@ -532,12 +620,15 @@
             const tbody = document.getElementById('table-body');
             const metrics = [
                 { label: 'Median Price', key: 'medianPrice', format: v => formatCurrency(v) },
-                { label: 'Entry Price', key: 'entryPrice', format: v => v ? formatCurrency(v) + '+' : formatCurrency(neighborhoods.find(n => n.id === 'clermont').entryPrice) + '+' },
+                { label: 'Entry Price', key: 'entryPrice', format: v => v ? formatCurrency(v) + '+' : '—' },
                 { label: 'School Rating', key: 'schoolRating' },
+                { label: 'Crime Safety', key: 'crimeSafety' },
+                { label: 'Median Household Income', key: 'medianIncome' },
+                { label: 'Property Tax (on $300K)', key: 'propertyTax' },
                 { label: 'Demographics', key: 'diversity' },
                 { label: 'Economic Stress', key: 'freeLunch' },
                 { label: 'Commute (Downtown)', key: 'commute' },
-                { label: 'Appreciation Outlook', key: 'notes', format: v => v.includes('flat') || v.includes('6K+') ? 'Flat (3-5 yrs)' : v.includes('built out') ? 'Steady' : 'Strong' }
+                { label: '2026 Price Forecast', key: 'forecast' }
             ];
 
             tbody.innerHTML = metrics.map(m => `
@@ -546,13 +637,15 @@
                     ${neighborhoods.map(n => {
                         let value = n[m.key];
                         if (m.format) value = m.format(value);
-                        if (m.key === 'entryPrice' && !n.entryPrice) value = '—';
                         
                         let cellClass = '';
-                        if (m.key === 'freeLunch' && value.includes('⚠️')) cellClass = 'style="color: var(--danger); font-weight: 600;"';
-                        if (m.key === 'schoolRating' && value.includes('10/10')) cellClass = 'style="color: var(--success); font-weight: 600;"';
+                        if (m.key === 'freeLunch' && value && value.includes('⚠️')) cellClass = 'style="color: var(--danger); font-weight: 600;"';
+                        if (m.key === 'schoolRating' && value && value.includes('10/10')) cellClass = 'style="color: var(--success); font-weight: 600;"';
+                        if (m.key === 'crimeSafety' && value && value.includes('99th')) cellClass = 'style="color: var(--success); font-weight: 600;"';
+                        if (m.key === 'forecast' && value && value.includes('+') && !value.includes('Flat')) cellClass = 'style="color: var(--success);"';
+                        if (m.key === 'forecast' && value && value.includes('Flat')) cellClass = 'style="color: var(--warning);"';
                         
-                        return `<td ${cellClass}>${value}</td>`;
+                        return `<td ${cellClass}>${value || '—'}</td>`;
                     }).join('')}
                 </tr>
             `).join('');
